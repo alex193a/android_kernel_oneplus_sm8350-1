@@ -1,0 +1,35 @@
+name: Build Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout kernel source
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Checkout zipper
+        uses: actions/checkout@v3
+        with:
+          repository: osm0sis/AnyKernel3
+          path: zipper
+
+      - name: Android kernel build
+        uses: lemniskett/android-kernel-actions@master
+        id: build
+        env:
+          PYTHON_VERSION: 2
+        with:
+          arch: arm64
+          compiler: clang/11/binutils
+          defconfig: vendor/lahaina-qgki_defconfig
+          image: Image
+
+      - name: Upload final output
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          path: zipper/*.zip
